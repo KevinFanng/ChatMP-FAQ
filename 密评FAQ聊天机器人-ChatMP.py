@@ -27,7 +27,7 @@ def query_knowledge_base(question):
         "history": [],
         "stream": False,
         "model_name": "zhipu-api",
-        "temperature": 0.7,
+        "temperature": 0.05,
         "max_tokens": 0,
         "prompt_name": "default"
     }
