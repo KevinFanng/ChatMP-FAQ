@@ -24,7 +24,9 @@ def query_knowledge_base(question):
         "knowledge_base_name": "samples",
         "top_k": 3,
         "score_threshold": 1,
-        "history": [],
+        #"history": [],
+        #保留历史会话
+        "history": st.session_state.history,
         "stream": False,
         "model_name": "zhipu-api",
         "temperature": 0.05,
@@ -53,12 +55,44 @@ st.write("本密评FAQ聊天机器人基于Langchain-Chatchat+GLM4")
 st.write("知识来源：《商用密码应用安全性评估FAQ第三版》")
 question = st.text_input("请输入您的问题：")
 
+# if st.button("提交"):
+#     if question:
+#         result = query_knowledge_base(question)
+#         if "error" in result:
+#             st.error("查询知识库时出错。")
+#         else:
+#             st.write("回答：")
+#             st.write(result["answer"])
+#             if result.get("docs"):
+#                 st.write("相关文档：")
+#                 for doc in result["docs"]:
+#                     st.write(doc)
+#             else:
+#                 st.write("没有相关文档。")
+#     else:
+#         st.warning("请输入一个问题。")
+
+#定义历史会话轮数
+num = 3
+if 'history' not in st.session_state:
+    st.session_state.history = []   
+user = {'role': 'user', 'content': ''}
+assistant = {'role': 'assistant', 'content': ''}
 if st.button("提交"):
     if question:
+        # st.write(st.session_state.history)
         result = query_knowledge_base(question)
         if "error" in result:
             st.error("查询知识库时出错。")
         else:
+            user = {'role': 'user', 'content': question}
+            assistant = {'role': 'assistant', 'content': result["answer"]}
+            st.session_state.history.append(user)
+            st.session_state.history.append(assistant)
+            if len(st.session_state.history) > 2 * num:
+                st.session_state.history = st.session_state.history[-(2 * num):]
+            st.write(len(st.session_state.history))
+            st.write(st.session_state.history)
             st.write("回答：")
             st.write(result["answer"])
             if result.get("docs"):
